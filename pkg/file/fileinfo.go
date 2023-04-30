@@ -125,32 +125,40 @@ func GetInfo(f fs.FS) ([]Info, error) {
 
 func List(w io.Writer, args []string, opts ListOpts) {
 	for _, arg := range args {
-		path, err := filepath.Abs(arg)
-		if err != nil {
-			fmt.Fprintf(w, "failed to get absolute path: %v\n", err)
-			continue
+		var path string
+		if strings.HasPrefix(arg, "~/") {
+			home, ok := os.LookupEnv("HOME")
+			if ok {
+				path = filepath.Join(home, strings.Trim(arg, "~/"))
+			} else {
+				fmt.Fprintf(w, "failed to get home path")
+				continue
+			}
 		}
-
 		f := os.DirFS(path)
 		files, err := GetInfo(f)
 		if err != nil {
-			fmt.Fprintf(w, "failed to get info from path %s: %v\n", arg, err)
+			fmt.Fprintf(w, "failed to get info from path %s: %v\n\n", arg, err)
 			continue
 		}
-
-		if opts.List {
-			if len(args) > 1 {
-				fmt.Fprintf(w, "%s:\n", arg)
+		if len(args) > 1 {
+			fmt.Fprintf(w, "%s:\n", path)
+		}
+		for _, info := range files {
+			if info.Hidden && !opts.ShowHidden {
+				continue
 			}
-			for _, info := range files {
-				if info.Hidden && !opts.ShowHidden {
-					continue
-				}
 
+			if opts.List {
 				fmt.Fprintf(w, "%v\n", info)
+			} else {
+				fmt.Fprintf(w, "%s ", info.Name)
 			}
 		}
 
+		if !opts.List {
+			fmt.Fprintln(w)
+		}
 		fmt.Fprintln(w)
 	}
 }
