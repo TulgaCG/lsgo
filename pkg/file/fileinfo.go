@@ -127,14 +127,14 @@ func List(w io.Writer, args []string, opts ListOpts) {
 	for _, arg := range args {
 		path, err := filepath.Abs(arg)
 		if err != nil {
-			fmt.Fprintf(w, "failed to get absolute path: %v", err)
+			fmt.Fprintf(w, "failed to get absolute path: %v\n", err)
 			continue
 		}
 
 		f := os.DirFS(path)
 		files, err := GetInfo(f)
 		if err != nil {
-			fmt.Fprintf(w, "failed to get info from path %s: %v", arg, err)
+			fmt.Fprintf(w, "failed to get info from path %s: %v\n", arg, err)
 			continue
 		}
 
