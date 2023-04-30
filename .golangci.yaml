@@ -13,7 +13,7 @@ linters-settings:
     sections:
       - standard
       - default
-      - prefix(github.com/TulgaCG/catgo)
+      - prefix(github.com/TulgaCG/lsgo)
 
   gofumpt:
     extra-rules: true

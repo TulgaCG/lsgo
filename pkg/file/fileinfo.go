@@ -3,7 +3,9 @@ package file
 import (
 	"fmt"
 	"io/fs"
+	"os"
 	"os/user"
+	"path/filepath"
 	"syscall"
 )
 
@@ -19,7 +21,11 @@ type Info struct {
 	Size    int64
 }
 
-func newInfo(path string, d fs.DirEntry, info fs.FileInfo) (Info, error){
+func (fi *Info) GetInfo() string {
+	return fmt.Sprintf("%s %s %v %s %s", fi.UID, fi.GID, fi.Size, fi.ModDate, fi.Name)
+}
+
+func newInfo(info fs.FileInfo) (Info, error) {
 	sys := info.Sys()
 	if sys == nil {
 		return Info{}, fmt.Errorf("failed to get file sys")
@@ -54,15 +60,17 @@ func GetFiles(f fs.FS) ([]Info, error) {
 		if err != nil {
 			return err
 		}
-		
-		info, err := fs.Stat(f, path)
-		if err != nil {
-			return fmt.Errorf("failed to get fs stats: %w", err)
-		}
 
 		switch {
-		case d.IsDir() && path != ".":
-			currentFile, err := newInfo(path, d, info)
+		case path == ".":
+			return nil
+		case d.IsDir():
+			info, err := fs.Stat(f, path)
+			if err != nil {
+				return fmt.Errorf("failed to get dir fs stats: %w", err)
+			}
+
+			currentFile, err := newInfo(info)
 			if err != nil {
 				return fmt.Errorf("failed to create new info: %w", err)
 			}
@@ -70,16 +78,33 @@ func GetFiles(f fs.FS) ([]Info, error) {
 			files = append(files, currentFile)
 
 			return fs.SkipDir
-		case path == ".":
-			return nil
-		}
+		case d.Type() == os.ModeSymlink:
+			symPath := filepath.Join(fmt.Sprint(f), path)
+			info, err := os.Lstat(symPath)
+			if err != nil {
+				return fmt.Errorf("failed to get stats of symlink: %w", err)
+			}
 
-		currentFile, err := newInfo(path, d, info)
-		if err != nil {
-			return fmt.Errorf("failed to create new info: %w", err)
-		}
+			currentFile, err := newInfo(info)
+			if err != nil {
+				return fmt.Errorf("failed to create new info: %w", err)
+			}
+			currentFile.Name = fmt.Sprintf("%s -> %s", currentFile.Name, symPath)
 
-		files = append(files, currentFile)
+			files = append(files, currentFile)
+		default:
+			info, err := fs.Stat(f, path)
+			if err != nil {
+				return fmt.Errorf("failed to get def fs stats: %w", err)
+			}
+
+			currentFile, err := newInfo(info)
+			if err != nil {
+				return fmt.Errorf("failed to create new info: %w", err)
+			}
+	
+			files = append(files, currentFile)
+		}
 
 		return nil
 	})
