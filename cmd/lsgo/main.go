@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -24,7 +25,7 @@ func main() {
 		f := os.DirFS(arg)
 		files, err := file.GetFiles(f)
 		if err != nil {
-			fmt.Fprintf(os.Stderr, "failed to get files from the path %s: %v", arg, err)
+			log.Fatalf("failed to get files from the path %s: %v", arg, err)
 		}
 
 		for _, f := range files {
