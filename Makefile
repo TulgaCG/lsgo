@@ -20,3 +20,7 @@ test:
 .PHONY: lint
 lint:
 	golangci-lint run --config=.golangci.yaml --fix
+
+.PHONY: run
+run:
+	go run ./cmd/lsgo/main.go
