@@ -2,10 +2,12 @@ package file
 
 import (
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 	"syscall"
 )
 
@@ -13,15 +15,21 @@ const (
 	tFormat string = "Jan 02 15:04"
 )
 
+type ListOpts struct {
+	List       bool
+	ShowHidden bool
+}
+
 type Info struct {
 	UID     string
 	GID     string
 	ModDate string
 	Name    string
 	Size    int64
+	Hidden  bool
 }
 
-func (fi *Info) GetInfo() string {
+func (fi Info) String() string {
 	return fmt.Sprintf("%s %s %v %s %s", fi.UID, fi.GID, fi.Size, fi.ModDate, fi.Name)
 }
 
@@ -51,10 +59,11 @@ func newInfo(info fs.FileInfo) (Info, error) {
 		ModDate: info.ModTime().Format(tFormat),
 		Name:    info.Name(),
 		Size:    info.Size(),
+		Hidden:  strings.HasPrefix(info.Name(), "."),
 	}, nil
 }
 
-func GetFiles(f fs.FS) ([]Info, error) {
+func GetInfo(f fs.FS) ([]Info, error) {
 	var files []Info
 	err := fs.WalkDir(f, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
@@ -102,7 +111,7 @@ func GetFiles(f fs.FS) ([]Info, error) {
 			if err != nil {
 				return fmt.Errorf("failed to create new info: %w", err)
 			}
-	
+
 			files = append(files, currentFile)
 		}
 
@@ -112,4 +121,36 @@ func GetFiles(f fs.FS) ([]Info, error) {
 		return nil, err
 	}
 	return files, nil
+}
+
+func List(w io.Writer, args []string, opts ListOpts) {
+	for _, arg := range args {
+		path, err := filepath.Abs(arg)
+		if err != nil {
+			fmt.Fprintf(w, "failed to get absolute path: %v", err)
+			continue
+		}
+
+		f := os.DirFS(path)
+		files, err := GetInfo(f)
+		if err != nil {
+			fmt.Fprintf(w, "failed to get info from path %s: %v", arg, err)
+			continue
+		}
+
+		if opts.List {
+			if len(args) > 1 {
+				fmt.Fprintf(w, "%s:\n", arg)
+			}
+			for _, info := range files {
+				if info.Hidden && !opts.ShowHidden {
+					continue
+				}
+
+				fmt.Fprintf(w, "%v\n", info)
+			}
+		}
+
+		fmt.Fprintln(w)
+	}
 }
