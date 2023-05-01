@@ -125,24 +125,23 @@ func GetInfo(f fs.FS) ([]Info, error) {
 
 func List(w io.Writer, args []string, opts ListOpts) {
 	for _, arg := range args {
-		var path string
 		if strings.HasPrefix(arg, "~/") {
 			home, ok := os.LookupEnv("HOME")
 			if ok {
-				path = filepath.Join(home, strings.Trim(arg, "~/"))
+				arg = filepath.Join(home, strings.Trim(arg, "~/"))
 			} else {
 				fmt.Fprintf(w, "failed to get home path")
 				continue
 			}
 		}
-		f := os.DirFS(path)
+		f := os.DirFS(arg)
 		files, err := GetInfo(f)
 		if err != nil {
 			fmt.Fprintf(w, "failed to get info from path %s: %v\n\n", arg, err)
 			continue
 		}
 		if len(args) > 1 {
-			fmt.Fprintf(w, "%s:\n", path)
+			fmt.Fprintf(w, "%s:\n", arg)
 		}
 		for _, info := range files {
 			if info.Hidden && !opts.ShowHidden {
