@@ -63,6 +63,22 @@ func newInfo(info fs.FileInfo) (Info, error) {
 	}, nil
 }
 
+func resolvePath(path string) (string, error) {
+	usr, err := user.Current()
+	if err != nil {
+		return "", fmt.Errorf("failed to get current user: %w", err)
+	}
+	dir := usr.HomeDir
+
+	if path == "~" {
+		path = dir
+	} else if strings.HasPrefix(path, "~/") {
+		path = filepath.Join(dir, path[2:])
+	}
+
+	return path, nil
+}
+
 func GetInfo(f fs.FS) ([]Info, error) {
 	var files []Info
 	err := fs.WalkDir(f, ".", func(path string, d fs.DirEntry, err error) error {
@@ -125,23 +141,19 @@ func GetInfo(f fs.FS) ([]Info, error) {
 
 func List(w io.Writer, args []string, opts ListOpts) {
 	for _, arg := range args {
-		if strings.HasPrefix(arg, "~/") {
-			home, ok := os.LookupEnv("HOME")
-			if ok {
-				arg = filepath.Join(home, strings.Trim(arg, "~/"))
-			} else {
-				fmt.Fprintf(w, "failed to get home path")
-				continue
-			}
+		path, err := resolvePath(arg)
+		if err != nil {
+			fmt.Fprintf(w, "failed to resolve path: %v", err)
 		}
-		f := os.DirFS(arg)
+
+		f := os.DirFS(path)
 		files, err := GetInfo(f)
 		if err != nil {
-			fmt.Fprintf(w, "failed to get info from path %s: %v\n\n", arg, err)
+			fmt.Fprintf(w, "failed to get info from path %s: %v\n\n", path, err)
 			continue
 		}
 		if len(args) > 1 {
-			fmt.Fprintf(w, "%s:\n", arg)
+			fmt.Fprintf(w, "%s:\n", path)
 		}
 		for _, info := range files {
 			if info.Hidden && !opts.ShowHidden {
