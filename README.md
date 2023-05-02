@@ -3,7 +3,7 @@ Catgo is a simple command-line interface (CLI) app written in Go. It is a projec
 
 lsgo is a CLI app written in Go. The aim of lsgo is to replicate the basic functionality of the standard Unix `ls` utility, which lists file informations in given path to stdout.
 
-# CLI Usage
+## CLI Usage
 To use lsgo, install the main package and run it directly in your terminal. Alternatively, you can install the catgo package and use it in your own Go projects.
 
 Here's how to install CLI with `go` command:
@@ -26,7 +26,7 @@ asmfmt catgo cmd dlv errcheck fillstruct godef goimports golangci-lint gomodifyt
 
 ```
 
-## Flags
+### Flags
 
 ```
 Usage of lsgo:
@@ -44,7 +44,7 @@ tlgcngd tlgcngd 4096 Apr 24 01:26 mod
 tlgcngd tlgcngd 4096 Apr 24 01:07 sumdb
 ```
 
-# Package Usage
+## Package Usage
 To use lsgo package in your own projects, you can use following command:
 ```bash
 $ go get github.com/TulgaCG/lsgo/pkg/file
@@ -93,8 +93,8 @@ Here's an example:
 	}
 ```
 
-# License
+## License
 lsgo is licensed under the Apache-2.0 License. Please see the [LICENSE](https://github.com/TulgaCG/lsgo/blob/main/LICENSE) file for more information.
 
-# Contributing
+## Contributing
 As this project is solely for my own learning purposes, I am not currently accepting contributions from external sources. However, if you have any suggestions or feedback, feel free to open an issue on the project's [GitHub page](https://github.com/TulgaCG/lsgo).
