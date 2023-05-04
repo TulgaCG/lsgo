@@ -60,7 +60,6 @@ import (
 )
 
 func main() {
-
 	arrayOfPaths := []string{
 		"~/",
 		"~/go/bin",

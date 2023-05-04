@@ -139,7 +139,7 @@ func GetInfo(f fs.FS) ([]Info, error) {
 	return files, nil
 }
 
-func List(w io.Writer, args []string, opts ListOpts) {
+func List(w io.Writer, opts ListOpts, args ...string) {
 	for _, arg := range args {
 		path, err := resolvePath(arg)
 		if err != nil {

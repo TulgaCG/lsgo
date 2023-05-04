@@ -16,5 +16,5 @@ func init() {
 }
 
 func main() {
-	file.List(os.Stdout, flag.Args(), opts)
+	file.List(os.Stdout, opts, flag.Args()...)
 }
