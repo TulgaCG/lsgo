@@ -46,7 +46,7 @@ func TestList(t *testing.T) {
 			actual := bytes.NewBufferString("")
 			file.List(actual, test.flags, test.input...)
 
-			expected, err := os.ReadFile("./testdata/golden/goldendata" + fmt.Sprint(test.id))
+			expected, err := os.ReadFile(fmt.Sprintf("./testdata/golden/goldendata/%d", test.id))
 			require.NoError(t, err)
 
 			require.Equal(t, string(expected), actual.String())
