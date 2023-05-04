@@ -44,7 +44,7 @@ func TestList(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.description, func(t *testing.T) {
 			actual := bytes.NewBufferString("")
-			file.List(actual, test.input, test.flags)
+			file.List(actual, test.flags, test.input...)
 
 			expected, err := os.ReadFile("./testdata/golden/goldendata" + fmt.Sprint(test.id))
 			require.NoError(t, err)
