@@ -21,13 +21,13 @@ func TestList(t *testing.T) {
 	}{
 		{
 			id:          0,
-			description: "Without flag",
-			input:       []string{"./testdata"},
+			description: "Single Existing",
+			input:       []string{"testdata"},
 		},
 		{
 			id:          1,
-			description: "With flag",
-			input:       []string{"./testdata"},
+			description: "Single Existing with Flag",
+			input:       []string{"testdata"},
 			flags: file.ListOpts{
 				List:       false,
 				ShowHidden: true,
@@ -35,9 +35,45 @@ func TestList(t *testing.T) {
 		},
 		{
 			id:          2,
-			description: "non-existing path",
-			input:       []string{"./testfile"},
+			description: "Single Non-existing",
+			input:       []string{"testfile"},
 			wantError:   true,
+		},
+		{
+			id:          3,
+			description: "Multiple Existing",
+			input:       []string{"testdata", "testdata/golden"},
+		},
+		{
+			id:          4,
+			description: "Multiple Existing with Flag",
+			input:       []string{"testdata", "testdata/golden"},
+			flags: file.ListOpts{
+				List:       false,
+				ShowHidden: true,
+			},
+		},
+		{
+			id:          5,
+			description: "Multiple Non-existing",
+			input:       []string{"testfile", "testdata/goldenfile"},
+			wantError:   true,
+		},
+		{
+			id:          6,
+			description: "Existing and Non-existing",
+			input:       []string{"testdata", "testfile"},
+			wantError:   true,
+		},
+		{
+			id:          7,
+			description: "Existing and Non-existing with Flag",
+			input:       []string{"testdata", "testfile"},
+			wantError:   true,
+			flags: file.ListOpts{
+				List:       false,
+				ShowHidden: true,
+			},
 		},
 	}
 

@@ -1,0 +1,5 @@
+testdata:
+.testfile3.json golden symlink1 -> testdata/symlink1 testfile1 testfile2.yaml 
+
+failed to get info from path testfile: stat .: no such file or directory
+
