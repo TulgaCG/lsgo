@@ -75,7 +75,7 @@ func main() {
 ```
 This code will read informations of the files at the path $HOME, $HOME/go/bin, and output the the information to the stdout using long list formation.
 
-Alternatively you can use `file.GetInfo` function to get informations of the files as an `Info` array.
+Alternatively you can use `file.GetInfo` function to get informations of the files as an `file.Info` array.
 
 Here's an example:
 ```go
