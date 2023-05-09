@@ -1,0 +1,6 @@
+testdata:
+.testfile3.json golden symlink1 -> testdata/symlink1 testfile1 testfile2.yaml 
+
+testdata/golden:
+goldendata0 goldendata1 goldendata2 goldendata3 goldendata4 goldendata5 goldendata6 goldendata7 
+

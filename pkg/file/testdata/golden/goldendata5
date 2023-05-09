@@ -1,0 +1,4 @@
+failed to get info from path testfile: stat .: no such file or directory
+
+failed to get info from path testdata/goldenfile: stat .: no such file or directory
+
